@@ -1,6 +1,19 @@
 
 module.exports = function (runtime, global) {
     importClass("java.text.SimpleDateFormat");
+
+    global.loadDex = function(args){
+        let arr = []
+        for(let index=0;index<arguments.length;index++){
+            arr.push(new java.io.File(files.path(arguments[index])))
+        }
+        return runtime.loadDex(arr)
+    }
+
+    global.loadDexFromDir = function(dexPath){
+        return runtime.loadDexFromDir(new java.io.File(files.path(dexPath)))
+    }
+
     // Added by ozobi - 2025/02/01 > 添加: 跟踪打印
     global.traceLog = function(_msg, _logToFilePath){
         let err = new Error();

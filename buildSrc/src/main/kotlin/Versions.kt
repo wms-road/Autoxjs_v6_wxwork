@@ -1,5 +1,5 @@
 object Versions {
-    val appVersionName: String = "6.5.8.22"
+    val appVersionName: String = "6.5.8.23"
     val appVersionCode: Int = appVersionName.replace(".","").toInt()
 
     val devVersionCode: Int = appVersionCode

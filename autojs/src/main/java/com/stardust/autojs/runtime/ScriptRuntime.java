@@ -438,13 +438,24 @@ public class ScriptRuntime {
         }
     }
 
-    public DexClassLoader loadDex(String path) {
-        path = files.path(path);
+    public DexClassLoader loadDex(File[] files) {
         try {
-            return ((AndroidClassLoader) ContextFactory.getGlobal().getApplicationClassLoader()).loadDex(new File(path));
+            return ((AndroidClassLoader) ContextFactory.getGlobal().getApplicationClassLoader()).loadDex(files);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    public DexClassLoader loadDexFromDir(File dexPath) {
+        File[] files = dexPath.listFiles((dir, name) -> name.endsWith(".dex"));
+        return loadDex(files);
+    }
+
+    public DexClassLoader loadDex(String path) {
+        path = files.path(path);
+        File[] files = new File[1];
+        files[0] = new File(path);
+        return loadDex(files);
     }
 
     public void exit() {

@@ -494,7 +494,8 @@ private fun CheckForUpdate(model: DrawerViewModel = viewModel()) {
         Text(text = stringResource(R.string.text_check_for_updates))
     }
     if (showDialog && model.githubReleaseInfo != null) {
-        AlertDialog(onDismissRequest = { showDialog = false },
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
             title = {
                 Text(
                     text = stringResource(
@@ -1882,17 +1883,32 @@ fun detailsDialog(context: Context) {
         .item(
             R.id.modification_detail,
             R.drawable.ic_edit_black_48dp,
+            "<=== 65823 ===>"
+        )
+        .item(
+            R.id.modification_detail,
+            R.drawable.ic_ali_log,
+            "修改: 取消编辑代码时新建活动\n\n" +
+                    "添加: app 方法 getCurActivity()、setStatusBarColor(int color)、setSystemUiVisibility(int flag)\n\n" +
+                    "修复: x86安装包缺少两个 so 文件\n\n" +
+                    "添加: loadDexFromDir(dexDir) 全局方法, 加载指定文件夹下的所有后缀为 .dex 的文件\n\n" +
+                    "增强: 将 loadDex 加到全局方法, 同时支持多个 dex 文件一起加载 loadDex(dexPath1, dexPath2...)\n\n" +
+                    "修复: ui 脚本无法通过命令停止"
+        )
+        .item(
+            R.id.modification_detail,
+            R.drawable.ic_edit_black_48dp,
             "<=== 65822 ===>"
         )
         .item(
             R.id.modification_detail,
             R.drawable.ic_ali_log,
-            "修复: 脚本运行结束后资源没有回收导致的内存泄露\n\n"+
-            "添加: 脚本文件卡片创建快捷方式选项(有些手机可能不起作用, 快捷方式也可以通过安卓小部件创建)\n\n"+
-            "修改: 通过 runtime.loadDex 或 runtime.loadJar 加载dex或包时返回 DexClassLoader\n" +
+            "修复: 脚本运行结束后资源没有回收导致的内存泄露\n\n" +
+                    "添加: 脚本文件卡片创建快捷方式选项(有些手机可能不起作用, 快捷方式也可以通过安卓小部件创建)\n\n" +
+                    "修改: 通过 runtime.loadDex 或 runtime.loadJar 加载dex或包时返回 DexClassLoader\n" +
                     "~ let dexClassLoader = runtime.loadDex(\"./test.dex\")\n\n" +
-            "修复: ppocrv5 内存泄露\n\n"+
-            "修复: 模拟器编辑代码 ctrl + s 会使 app 崩溃"
+                    "修复: ppocrv5 内存泄露\n\n" +
+                    "修复: 模拟器编辑代码 ctrl + s 会使 app 崩溃"
         )
         .item(
             R.id.modification_detail,
@@ -1902,15 +1918,15 @@ fun detailsDialog(context: Context) {
         .item(
             R.id.modification_detail,
             R.drawable.ic_ali_log,
-            "修复: 排序改变之后无法操作正确的卡片\n\n"+
-            "添加: 创建项目选项, 项目文件夹打包和运行按钮\n\n"+
-            "修改: 主页不再将文件和文件夹分成两个列表\n\n"+
-            "添加: ppocrv5(只有 autox app 可用, 通用的还没弄好), 具体使用看示例脚本\n\n"+
-            "修复: 某些情况主页搜索会使app崩溃\n\n"+
-            "添加: 任务卡片长按操作\n\n"+
-            "修复: 运行中的脚本路径太长导致关闭按钮被挤出屏幕\n\n"+
-            "修复: 非脚本文件重命名按钮显示不完整\n\n"+
-            "添加: Storage 实例方法: getAll、getAllKeys、getPref"
+            "修复: 排序改变之后无法操作正确的卡片\n\n" +
+                    "添加: 创建项目选项, 项目文件夹打包和运行按钮\n\n" +
+                    "修改: 主页不再将文件和文件夹分成两个列表\n\n" +
+                    "添加: ppocrv5(只有 autox app 可用, 通用的还没弄好), 具体使用看示例脚本\n\n" +
+                    "修复: 某些情况主页搜索会使app崩溃\n\n" +
+                    "添加: 任务卡片长按操作\n\n" +
+                    "修复: 运行中的脚本路径太长导致关闭按钮被挤出屏幕\n\n" +
+                    "修复: 非脚本文件重命名按钮显示不完整\n\n" +
+                    "添加: Storage 实例方法: getAll、getAllKeys、getPref"
         )
         .item(
             R.id.modification_detail,

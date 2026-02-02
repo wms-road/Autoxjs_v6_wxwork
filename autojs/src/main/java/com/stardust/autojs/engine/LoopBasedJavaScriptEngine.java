@@ -77,9 +77,9 @@ public class LoopBasedJavaScriptEngine extends RhinoJavaScriptEngine {
 
     @Override
     public void forceStop() {
-        WeakReference<Activity> activityRef = (WeakReference<Activity>) getTag("activity");
-        if (activityRef != null && activityRef.get() != null) {
-            activityRef.get().finish();
+        Activity activity = (Activity) getTag("activity");
+        if (activity != null) {
+            activity.finish();
         }
         super.forceStop();
     }

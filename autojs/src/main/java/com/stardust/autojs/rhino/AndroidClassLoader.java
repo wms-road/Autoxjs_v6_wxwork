@@ -122,12 +122,36 @@ public class AndroidClassLoader extends ClassLoader implements GeneratedClassLoa
     }
 
     public DexClassLoader loadDex(File file) throws FileNotFoundException {
-        Log.d(LOG_TAG, "loadDex: file = " + file);
-        if (!file.exists()) {
-            throw new FileNotFoundException(file.getPath());
+        File[] files = new File[1];
+        files[0] = file;
+        return loadDex(files);
+    }
+
+    public DexClassLoader loadDex(File[] files) throws FileNotFoundException {
+        if (files == null || files.length == 0) {
+            throw new IllegalArgumentException("loadDex: files must not be empty");
         }
-        file.setWritable(false);
-        DexClassLoader loader = new DexClassLoader(file.getPath(), mCacheDir.getPath(), null, parent);
+
+        StringBuilder dexPath = new StringBuilder();
+        for (int i = 0; i < files.length; i++) {
+            File f = files[i];
+            if (f == null || !f.exists()) {
+                throw new FileNotFoundException("Missing dex/jar: " + f);
+            }
+            f.setWritable(false);                 // 可选：只读保护
+            dexPath.append(f.getAbsolutePath());
+            if (i != files.length - 1) {
+                dexPath.append(File.pathSeparator); // ":"
+            }
+        }
+
+        Log.d(LOG_TAG, "loadDex: dexPath = " + dexPath);
+        DexClassLoader loader = new DexClassLoader(
+                dexPath.toString(),
+                mCacheDir.getPath(),
+                null,
+                parent);
+
         mDexClassLoaders.add(loader);
         return loader;
     }

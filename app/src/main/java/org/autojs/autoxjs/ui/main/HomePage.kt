@@ -713,7 +713,7 @@ fun ListItemCard(
                                             clearSelectedMap()
                                         } else if (isTextFile(fileItem.extension)) {
                                             lastOperationFilePath.value = fileItem.path
-                                            EditActivity.editFile(context, fileItem.path, true)
+                                            EditActivity.editFile(context, fileItem.path, false)
                                         }
 //                                        else if (isCompressedFile(fileItem.fileNameSuffix)) {
 //                                            Toast

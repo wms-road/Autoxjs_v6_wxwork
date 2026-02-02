@@ -55,7 +55,7 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 ##########################
 androidx-activity-ktx = "androidx.activity:activity-ktx:1.5.1"
 
-commons-io = "commons-io:commons-io:2.6"
+commons-io = "commons-io:commons-io:2.20.0"
 eventbus = "org.greenrobot:eventbus:3.3.1"
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines-android" }
 androidx-webkit = "androidx.webkit:webkit:1.7.0"
