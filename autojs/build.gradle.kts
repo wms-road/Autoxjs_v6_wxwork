@@ -69,8 +69,8 @@ dependencies {
     api(libs.okhttp)
     // JDeferred
     api("org.jdeferred:jdeferred-android-aar:1.2.6")
-    // RootShell
-    api("com.github.Stericson:RootShell:1.6")
+    // RootShell 1.6 公共源已绝迹（JitPack 构建失败 / jcenter 镜像已清），改为本地 vendoring 的 jar
+    api(files("libs/RootShell-1.6.jar"))
 //    implementation("com.github.Stericson:RootShell:1.4")
     // Gson
     api(libs.google.gson)
