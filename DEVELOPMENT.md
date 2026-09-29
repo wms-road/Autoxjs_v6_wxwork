@@ -9,6 +9,38 @@
 
 ---
 
+## 0. 项目结构与关键文件
+
+```
+Autoxjs_v6_wxwork/
+├── app/                  # 主应用模块：最终编出的 AutoX 引擎 APK 来自这里（:app:assembleV6Debug/Release）
+│   ├── build.gradle.kts  #   签名配置(signingReady 判空)、NDK 26.2.11394342、v6 flavor、docs 占位跳过下载
+│   └── src/main/assets/
+│       ├── docs/index.html   # 离线帮助文档占位（已入库，使 preBuild 跳过联网下载）
+│       └── sample/           # AutoX 自带示例脚本（含通知监听等，可参考）
+├── inrt/                 # 内置 runtime 模板 APK 模块，被 app 打包进最终产物；签名同 sign/sign.properties
+├── autojs/               # AutoX 核心 JS 引擎与 API 实现（Rhino 引擎、脚本运行环境）
+├── automator/            # 无障碍自动化核心（UiAutomator 封装，驱动 UI 操作）
+├── common/               # 公共资源/库（字符串、布局、通用组件）
+├── apkbuilder/           # APK 打包辅助工具（打包脚本与类）
+├── paddleocr/            # PaddleOCR 原生库（.so 等）
+├── ppocrv5/              # PaddleOCR v5 原生 OCR 模块（namespace com.ozobi.ppocrv5，NDK 26.1.10909125/r26b）
+├── LocalRepo/            # 本地 aar 仓库（离线依赖源）
+├── scripts/              # 构建/签名/工具脚本（gen-sign / addbom / verifyscript）
+├── sign/                 # 签名产物（sign/my-release.jks + sign.properties，git-ignored，由 gen-sign.ps1 生成）
+├── gradle/               # Gradle wrapper 配置（gradle-wrapper.properties 固定 8.7）
+├── build-apk.ps1 / .bat  # 一键构建（交互选 Debug/Release，自动装 NDK、调用 gen-sign）
+├── install-apk.ps1/.bat  # 一键装真机（定位产物 APK + adb install -r）
+├── build.gradle.kts      # 根构建：AGP 8.6.0、阿里云/华为云镜像、注释掉的原作者私有 nexus
+├── settings.gradle       # 模块注册（app/inrt/autojs/automator/common/apkbuilder/paddleocr/ppocrv5）
+├── gradle.properties      # 全局 Gradle 属性（原作者代理已注释）
+├── gradlew / gradlew.bat  # Gradle wrapper 启动器
+├── DEVELOPMENT.md         # 本开发指南
+├── README.md / CHANGELOG*.md / LICENSE*.md  # 上游说明与许可（GPL V2）
+```
+
+> 开发者日常只需关心：**`app/`**（产物来源）、**`scripts/`**（一键脚本）、**`build-apk.*` / `install-apk.*`**（构建安装入口）、**`sign/`**（Release 签名）。`autojs/`、`automator/`、`paddleocr/`、`ppocrv5/` 等是引擎与原生能力实现，平时无需改动。
+
 ## 1. 环境前置
 
 | 项 | 要求 | 说明 |
