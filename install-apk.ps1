@@ -21,10 +21,10 @@ if (-not (Test-Path $ADB)) {
 # Under $ErrorActionPreference='Stop' that becomes a terminating NativeCommandError,
 # so wrap adb calls here: capture output, keep exit code, never throw on stderr.
 function Invoke-Adb {
-    param([string[]]$Args)
+    param([string[]]$AdbArgs)
     $prev = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    try { & $ADB @Args 2>&1 }
+    try { & $ADB @AdbArgs 2>&1 }
     finally { $ErrorActionPreference = $prev }
 }
 
@@ -45,14 +45,36 @@ if (-not $apk) { $apk = $apks[0] }
 
 Write-Host "Using APK: $($apk.FullName) ($([math]::Round($apk.Length/1MB,1)) MB)"
 
-# list authorized devices only (skip offline/unauthorized/emulator-less lines)
-$raw = Invoke-Adb -Args @('devices')
-$devices = @()
+# enumerate devices and classify state (device / unauthorized / offline / none)
+$raw = Invoke-Adb -AdbArgs @('devices')
+$devices = @(); $unauth = @(); $offline = @()
 foreach ($line in $raw) {
-    if ($line -match '^\s*(\S+)\s+device\s*$') { $devices += $Matches[1] }
+    if ($line -match '^\s*(\S+)\s+device\b') { $devices += $Matches[1] }
+    elseif ($line -match '^\s*(\S+)\s+unauthorized\b') { $unauth += $Matches[1] }
+    elseif ($line -match '^\s*(\S+)\s+offline\b') { $offline += $Matches[1] }
 }
+Write-Host "adb devices output:"
+foreach ($line in $raw) { if ($line.Trim()) { Write-Host "  $line" } }
+
 if ($devices.Count -eq 0) {
-    Write-Error "No authorized device connected. Enable USB debugging, accept the prompt on phone, then retry."
+    if ($unauth.Count -gt 0) {
+        Write-Host "Device(s) detected but UNAUTHORIZED: $($unauth -join ', ')"
+        Write-Host "  -> On the phone, tap 'Allow' on the 'Allow USB debugging?' dialog"
+        Write-Host "     (tick 'Always allow from this computer' to avoid repeat prompts)."
+        Write-Host "  -> If no dialog appears: Developer Options -> 'Revoke USB debugging authorizations',"
+        Write-Host "     unplug & re-plug the cable, then tap 'Allow' when prompted."
+    } elseif ($offline.Count -gt 0) {
+        Write-Host "Device(s) OFFLINE: $($offline -join ', ')."
+        Write-Host "  -> Try unplug & re-plug, or run 'adb kill-server' then retry."
+    } else {
+        Write-Host "No device detected at all."
+        Write-Host "  -> Use a DATA-capable USB cable and a working USB port (charger-only cables won't enumerate)."
+        Write-Host "  -> On the phone: Developer Options -> 'USB debugging' ON; some brands also need"
+        Write-Host "     'USB debugging (Security settings)' and 'USB installation'."
+        Write-Host "  -> Set USB mode to 'File Transfer (MTP)' (the CD-drive mode you saw is normal)."
+        Write-Host "  -> If still nothing: 'adb kill-server' then 'adb devices' in a terminal to confirm."
+    }
+    Write-Error "No authorized device connected. Resolve the above, then retry."
     exit 1
 }
 
@@ -67,7 +89,7 @@ if ($devices.Count -eq 1) {
 }
 
 Write-Host "Installing to $serial ..."
-$installOut = Invoke-Adb -Args @('-s', $serial, 'install', '-r', $apk.FullName)
+$installOut = Invoke-Adb -AdbArgs @('-s', $serial, 'install', '-r', $apk.FullName)
 Write-Host ($installOut -join "`n")
 if ($LASTEXITCODE -ne 0) { Write-Error "adb install failed (exit $LASTEXITCODE)"; exit $LASTEXITCODE }
 Write-Host "DONE. App package: org.autojs.autoxjs.ozobi.v6"
