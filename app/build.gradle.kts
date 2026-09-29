@@ -14,7 +14,7 @@ plugins {
 
 //val SupportLibVersion = "28.0.0"
 
-val propFile: File = File("F:/ozobiozobi/sign/sign.properties")
+val propFile: File = File("F:/wxwork/sign/sign.properties")
 val properties = Properties()
 if (propFile.exists()) {
     propFile.inputStream().reader().use {
@@ -48,8 +48,8 @@ android {
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
         }
-        applicationIdSuffix = "ozobi"
-        versionNameSuffix = "_ozobi"
+        applicationIdSuffix = "wxwork"
+        versionNameSuffix = "_wxwork"
     }
     buildFeatures {
         compose = true
@@ -145,7 +145,7 @@ android {
             versionName = Versions.devVersionName
             buildConfigField("String", "CHANNEL", "\"v6\"")
 //            buildConfigField("String", "APPID", "\"?id=23\"")
-            manifestPlaceholders.putAll(mapOf("appName" to "Autox.js v6_ozobi"))
+            manifestPlaceholders.putAll(mapOf("appName" to "Autox.js v6_wxwork"))
         }
     }
 
