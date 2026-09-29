@@ -97,6 +97,15 @@ app\build\outputs\apk\v6\debug\app-v6-universal-debug.apk
 
 ## 6. 安装到真机
 
+**自动方式（推荐）**：双击 `install-apk.bat`（或 `.\install-apk.ps1`），脚本会自动：
+- 定位产物 APK（优先 `app-v6-arm64-v8a-debug.apk`，找不到再退到 universal/其他）；
+- 检测已连接且 `device` 状态的设备（多设备时交互让你选序号）；
+- 执行 `adb install -r <apk>`。
+
+若 `adb` 不在默认 `D:\Android\Sdk\platform-tools\adb.exe`，请改 `install-apk.ps1` 顶部的 `$ANDROID_HOME`，或把 `platform-tools` 加进 PATH。
+
+**手动方式**：
+
 1. 手机开启 **开发者选项 → USB 调试**，用数据线连电脑；弹窗"允许 USB 调试"点确定。
 2. 电脑端确认 `adb devices` 能看到该设备（无 adb 就在 SDK 的 `platform-tools/` 下用，或加进 PATH）。
 3. 安装：
@@ -123,6 +132,8 @@ adb install -r app\build\outputs\apk\v6\debug\app-v6-arm64-v8a-debug.apk
 | `addbom.ps1 -Path <file>` | 给 `.ps1` 加 UTF-8 BOM，解决 GBK 控制台读中文源码乱码。 |
 | `verifyscript.ps1 -Path <file>` | 用 PowerShell 解析器校验 `.ps1` 语法、不执行，改完自检用。 |
 
+根目录另有两个一键脚本：`build-apk.bat`（构建）、`install-apk.bat`（装真机）。
+
 ---
 
 ## 8. 排错速查
@@ -131,4 +142,5 @@ adb install -r app\build\outputs\apk\v6\debug\app-v6-arm64-v8a-debug.apk
 - **NDK 安装卡住/失败**：检查网络或配置代理（见 §3）。两个 NDK 都要成功，缺任一个原生模块编不过。
 - **Gradle 下载慢/失败**：依赖阿里云/华为云镜像；如需代理在 `build-apk.ps1` 第 46 行开启。
 - **`adb install` 报 `INSTALL_PARSE_FAILED_NO_CERTIFICATES`**：说明装的是未签名 Release 包（签名生成失败）。改用 Debug 包，或确认 `sign/` 已生成后再编 Release。
+- **`install-apk.ps1` 报找不到设备**：手机未开 USB 调试 / 未授权；`adb devices` 仅显示 `unauthorized` 时去手机点"允许"。
 - **想离线且含真文档**：当前占位方案 APK 帮助页空白（POC 无影响）。要真文档，把 `code-lib/AutoxjsDocs` 构建产物解压进 `app/src/main/assets/docs/`（需生成 `index.html`），且 **不要执行 `gradlew clean`**（会删该目录重新触发下载）。
