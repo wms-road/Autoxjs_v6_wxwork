@@ -177,3 +177,4 @@ adb install -r app\build\outputs\apk\v6\debug\app-v6-arm64-v8a-debug.apk
 - **`install-apk.ps1` 报找不到设备**：手机未开 USB 调试 / 未授权；`adb devices` 仅显示 `unauthorized` 时去手机点"允许"。
 - **想离线且含真文档**：当前占位方案 APK 帮助页空白（POC 无影响）。要真文档，把 `code-lib/AutoxjsDocs` 构建产物解压进 `app/src/main/assets/docs/`（需生成 `index.html`），且 **不要执行 `gradlew clean`**（会删该目录重新触发下载）。
 - **配置期报 `properties.getProperty("storeFile") must not be null`**：说明 `sign/sign.properties` 损坏（常见于旧方式生成时带 UTF-8 BOM，Gradle 按 ISO-8859-1 读把 BOM 拼到首行 key 前）。修复：运行 `scripts/gen-sign.ps1` 重新生成干净文件（已改为无 BOM ASCII 写入）；`app`/`inrt` 的 `build.gradle.kts` 也已加防御性判空——文件缺字段只跳过 Release 签名，Debug 不受影响。
+- **`validateSigningV6Debug` 报 Keystore file 找不到（路径被拼成 `app\E:PublicWorkspace...`）**：这是 Java `.properties` 把 `storeFile` 里的 Windows 反斜杠当转义符吞掉、导致 Gradle 将其误判为相对路径的坑。`gen-sign.ps1` 已改为写入**相对路径** `sign/my-release.jks`，`build.gradle.kts` 用 `File(rootDir, storeFile)` 解析（不再用绝对路径）；重新运行 `scripts/gen-sign.ps1` 重新生成即可（已内置此修复）。

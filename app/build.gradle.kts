@@ -79,7 +79,7 @@ android {
     signingConfigs {
         if (signingReady) {
             create("release") {
-                storeFile = file(properties.getProperty("storeFile")!!)
+                storeFile = File(rootDir, properties.getProperty("storeFile")!!)
                 storePassword = properties.getProperty("storePassword")!!
                 keyAlias = properties.getProperty("keyAlias")!!
                 keyPassword = properties.getProperty("keyPassword")!!

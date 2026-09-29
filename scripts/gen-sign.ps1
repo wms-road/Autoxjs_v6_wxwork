@@ -55,11 +55,16 @@ if (Test-Path $keystore) {
 }
 
 # sign.properties content matches app/build.gradle.kts (standard Android signing four fields).
-# storeFile uses absolute path so Gradle file() resolves reliably; change it to relocate.
-# IMPORTANT: write as ASCII / no-BOM. Gradle's Properties.load(Reader) reads ISO-8859-1 and treats a
-# UTF-8 BOM as part of the first key, corrupting "storeFile" -> getProperty("storeFile") returns null -> NPE.
+# IMPORTANT:
+#  - write as ASCII / no-BOM. Gradle's Properties.load(Reader) reads ISO-8859-1 and treats a UTF-8 BOM
+#    as part of the first key, corrupting "storeFile" -> getProperty("storeFile") returns null -> NPE.
+#  - storeFile is written RELATIVE to repo root ("sign/<file>"). A raw absolute Windows path like
+#    "E:\dir\..\my.jks" gets its backslashes STRIPPED by Properties.load (backslash = escape char),
+#    leaving "E:dir..." which Gradle treats as relative -> "app\E:dir..." not found. build.gradle.kts
+#    resolves it via File(rootDir, storeFile), so a forward-slash relative path is correct & portable.
+$storeFileProp = "sign/$StoreFile"
 $props = @"
-storeFile=$keystore
+storeFile=$storeFileProp
 storePassword=$Password
 keyAlias=$Alias
 keyPassword=$Password
