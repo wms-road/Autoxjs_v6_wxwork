@@ -56,13 +56,15 @@ if (Test-Path $keystore) {
 
 # sign.properties content matches app/build.gradle.kts (standard Android signing four fields).
 # storeFile uses absolute path so Gradle file() resolves reliably; change it to relocate.
+# IMPORTANT: write as ASCII / no-BOM. Gradle's Properties.load(Reader) reads ISO-8859-1 and treats a
+# UTF-8 BOM as part of the first key, corrupting "storeFile" -> getProperty("storeFile") returns null -> NPE.
 $props = @"
 storeFile=$keystore
 storePassword=$Password
 keyAlias=$Alias
 keyPassword=$Password
 "@
-Set-Content -Path $propFile -Value $props -Encoding UTF8
+[System.IO.File]::WriteAllText($propFile, $props, [System.Text.Encoding]::ASCII)
 Write-Host "[ok  ] generated: $propFile"
 Write-Host ""
 Write-Host "Done. Now run: gradlew :app:assembleV6Release  (uses this signing for an installable release APK)."

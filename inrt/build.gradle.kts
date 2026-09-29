@@ -6,12 +6,21 @@ plugins {
     id("kotlin-android")
 }
 
-val propFile: File = File("E:/资料/jks/autojs-inrt/sign.properties");
+val propFile: File = File(rootDir, "sign/sign.properties")
 val properties = Properties()
 if (propFile.exists()) {
     propFile.reader().use {
         properties.load(it)
     }
+}
+// 防御性判空：sign.properties 存在但缺少必要字段时跳过 Release 签名，避免 NPE 连 Debug 都编不过。
+val signingReady: Boolean = propFile.exists() &&
+    properties.getProperty("storeFile") != null &&
+    properties.getProperty("storePassword") != null &&
+    properties.getProperty("keyAlias") != null &&
+    properties.getProperty("keyPassword") != null
+if (propFile.exists() && !signingReady) {
+    logger.warn("sign/sign.properties 存在但缺少签名必要字段，已跳过 Release 签名配置；Debug 包不受影响。如需 Release，请运行 scripts/gen-sign.ps1 重新生成。")
 }
 
 android {
@@ -40,12 +49,12 @@ android {
     }
 
     signingConfigs {
-        if (propFile.exists()) {
+        if (signingReady) {
             getByName("release") {
-                storeFile = file(properties.getProperty("storeFile"))
-                storePassword = properties.getProperty("storePassword")
-                keyAlias = properties.getProperty("keyAlias")
-                keyPassword = properties.getProperty("keyPassword")
+                storeFile = file(properties.getProperty("storeFile")!!)
+                storePassword = properties.getProperty("storePassword")!!
+                keyAlias = properties.getProperty("keyAlias")!!
+                keyPassword = properties.getProperty("keyPassword")!!
             }
         }
     }
@@ -58,7 +67,7 @@ android {
                     "proguard-rules.pro"
                 )
             )
-            if (propFile.exists()) {
+            if (signingReady) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
@@ -70,7 +79,7 @@ android {
                     "proguard-rules.pro"
                 )
             )
-            if (propFile.exists()) {
+            if (signingReady) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }

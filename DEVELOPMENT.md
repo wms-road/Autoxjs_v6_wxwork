@@ -144,3 +144,4 @@ adb install -r app\build\outputs\apk\v6\debug\app-v6-arm64-v8a-debug.apk
 - **`adb install` 报 `INSTALL_PARSE_FAILED_NO_CERTIFICATES`**：说明装的是未签名 Release 包（签名生成失败）。改用 Debug 包，或确认 `sign/` 已生成后再编 Release。
 - **`install-apk.ps1` 报找不到设备**：手机未开 USB 调试 / 未授权；`adb devices` 仅显示 `unauthorized` 时去手机点"允许"。
 - **想离线且含真文档**：当前占位方案 APK 帮助页空白（POC 无影响）。要真文档，把 `code-lib/AutoxjsDocs` 构建产物解压进 `app/src/main/assets/docs/`（需生成 `index.html`），且 **不要执行 `gradlew clean`**（会删该目录重新触发下载）。
+- **配置期报 `properties.getProperty("storeFile") must not be null`**：说明 `sign/sign.properties` 损坏（常见于旧方式生成时带 UTF-8 BOM，Gradle 按 ISO-8859-1 读把 BOM 拼到首行 key 前）。修复：运行 `scripts/gen-sign.ps1` 重新生成干净文件（已改为无 BOM ASCII 写入）；`app`/`inrt` 的 `build.gradle.kts` 也已加防御性判空——文件缺字段只跳过 Release 签名，Debug 不受影响。

@@ -21,6 +21,16 @@ if (propFile.exists()) {
         properties.load(it)
     }
 }
+// 防御性判空：sign.properties 存在但缺少必要字段（如带 BOM 导致首行 key 损坏）时，
+// 跳过 Release 签名配置，避免配置阶段 NPE 连 Debug 都编不过。
+val signingReady: Boolean = propFile.exists() &&
+    properties.getProperty("storeFile") != null &&
+    properties.getProperty("storePassword") != null &&
+    properties.getProperty("keyAlias") != null &&
+    properties.getProperty("keyPassword") != null
+if (propFile.exists() && !signingReady) {
+    logger.warn("sign/sign.properties 存在但缺少签名必要字段(storeFile/storePassword/keyAlias/keyPassword)，已跳过 Release 签名配置；Debug 包不受影响。如需 Release，请运行 scripts/gen-sign.ps1 重新生成。")
+}
 
 //configurations.all {
 //    resolutionStrategy {
@@ -67,12 +77,12 @@ android {
         kotlinCompilerExtensionVersion = Versions.compose_version
     }
     signingConfigs {
-        if (propFile.exists()) {
+        if (signingReady) {
             create("release") {
-                storeFile = file(properties.getProperty("storeFile"))
-                storePassword = properties.getProperty("storePassword")
-                keyAlias = properties.getProperty("keyAlias")
-                keyPassword = properties.getProperty("keyPassword")
+                storeFile = file(properties.getProperty("storeFile")!!)
+                storePassword = properties.getProperty("storePassword")!!
+                keyAlias = properties.getProperty("keyAlias")!!
+                keyPassword = properties.getProperty("keyPassword")!!
                 enableV1Signing = true
                 enableV2Signing = true
                 enableV3Signing = true
@@ -111,7 +121,7 @@ android {
                     "proguard-rules.pro"
                 )
             )
-            if (propFile.exists()) {
+            if (signingReady) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
@@ -124,7 +134,7 @@ android {
                     "proguard-rules.pro"
                 )
             )
-            if (propFile.exists()) {
+            if (signingReady) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
